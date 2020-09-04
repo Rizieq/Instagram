@@ -1,0 +1,231 @@
+{
+  "project_info": {
+    "project_number": "859010082200",
+    "firebase_url": "https://cookode-c9841.firebaseio.com",
+    "project_id": "cookode-c9841",
+    "storage_bucket": "cookode-c9841.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859010082200:android:2eade955ea2a75b689f7ed",
+        "android_client_info": {
+          "package_name": "com.rizieq.instagram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859010082200-qut8i05a72vcrn57kglfeemeaibn3glj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rizieq.instagram",
+            "certificate_hash": "6c34f1d08bc7ff9027a5d5884c5720ae3486dd45"
+          }
+        },
+        {
+          "client_id": "859010082200-528sbl6p16rh945ad8njv2436a6jshuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCygqglrLaiar8NKcxjIV6cKYOaLHoAcyE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859010082200-528sbl6p16rh945ad8njv2436a6jshuj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859010082200:android:bbf106aebe61bae989f7ed",
+        "android_client_info": {
+          "package_name": "cookode.instagram_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859010082200-ghp4c5beb2amic0qhjo413j08dde0sev.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "50585169ff1ac2a6d5cb34922726061ef34a68f6"
+          }
+        },
+        {
+          "client_id": "859010082200-omtqarqavf4ta6eiguvb8jrt7tgc9q8l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "b605856ca7ba33f95a27194664df8160a2715e07"
+          }
+        },
+        {
+          "client_id": "859010082200-4qdnbbhtdbn767fm01mab4kf9qge8ma3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "1aa27f140ff22ca5ad8d9d3aff33cdf1c50300e9"
+          }
+        },
+        {
+          "client_id": "859010082200-pn8njro7ed0ipiesd8ai5g5rlvsd1f8u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "163ac399ef1c721b3b1e2ab3ea09f1c8072f12f2"
+          }
+        },
+        {
+          "client_id": "859010082200-q3m07pgis9qg7u1i2b760n8qmvqjm88e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "3dbb16237265bbb7f66d274959fb883428de312d"
+          }
+        },
+        {
+          "client_id": "859010082200-jsmqu1vb9l08u6urdevfu5216l819upq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "347dbdf20c807291ab47b1532cccb004017775bd"
+          }
+        },
+        {
+          "client_id": "859010082200-enpb4l6ktftbe38ijnfsos720rkvbtdv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "bc8a8c268c9b032926a96224f5293d5c174d15c1"
+          }
+        },
+        {
+          "client_id": "859010082200-gegs6ncqapl398elem077cd1hf619etc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "6c34f1d08bc7ff9027a5d5884c5720ae3486dd45"
+          }
+        },
+        {
+          "client_id": "859010082200-4ui2rjq7eiptpdje8j0lgmiv8be97kv7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "caf49711b9310d98e5777dcbd88124ee8b463b1d"
+          }
+        },
+        {
+          "client_id": "859010082200-3sj7aoa0t38heai8ho84ggm20us2jgpn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.instagram_clone",
+            "certificate_hash": "1e554490c1ff2aa5321cf50e1e335b57ee41e2ad"
+          }
+        },
+        {
+          "client_id": "859010082200-528sbl6p16rh945ad8njv2436a6jshuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCygqglrLaiar8NKcxjIV6cKYOaLHoAcyE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859010082200-528sbl6p16rh945ad8njv2436a6jshuj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859010082200:android:33960bbf86eb8fa289f7ed",
+        "android_client_info": {
+          "package_name": "cookode.project_whatsapp.whatsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859010082200-e7sajiceg0likiiha3j8ijj41h9uuaco.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cookode.project_whatsapp.whatsapp",
+            "certificate_hash": "1e554490c1ff2aa5321cf50e1e335b57ee41e2ad"
+          }
+        },
+        {
+          "client_id": "859010082200-528sbl6p16rh945ad8njv2436a6jshuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCygqglrLaiar8NKcxjIV6cKYOaLHoAcyE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859010082200-528sbl6p16rh945ad8njv2436a6jshuj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859010082200:android:5d5c6eabe975f64b89f7ed",
+        "android_client_info": {
+          "package_name": "tapperware.man.instagrem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859010082200-pej5ff7b8lk1fk4gmfqior65dralibi3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tapperware.man.instagrem",
+            "certificate_hash": "1aa27f140ff22ca5ad8d9d3aff33cdf1c50300e9"
+          }
+        },
+        {
+          "client_id": "859010082200-528sbl6p16rh945ad8njv2436a6jshuj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCygqglrLaiar8NKcxjIV6cKYOaLHoAcyE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859010082200-528sbl6p16rh945ad8njv2436a6jshuj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
