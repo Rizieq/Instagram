@@ -38,6 +38,17 @@ class SettingActivity : AppCompatActivity() {
     private var imageUri : Uri? = null
     private var storageProfilePictureRef: StorageReference? = null
 
+    private var usersRef = FirebaseDatabase.getInstance()
+    private var fbImage: String = ""
+    private var fbUsername: String = ""
+    private var fbBiodata: String = ""
+    private var fbFullname: String = ""
+
+    private var inImage: String = ""
+    private var inUsername: String = ""
+    private var inBiodata: String = ""
+    private var inFullname: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting_account)
@@ -68,6 +79,7 @@ class SettingActivity : AppCompatActivity() {
             } else {
                 updateUserInfoOnly()
             }
+
 
         }
 
@@ -184,6 +196,26 @@ class SettingActivity : AppCompatActivity() {
                 progressDialog.setMessage("Please wait.., we are updating profile..")
                 progressDialog.show()
 
+
+
+                val ref = FirebaseDatabase.getInstance().reference.child("Users")
+
+                val userMap = HashMap<String, Any>()
+                //sesuai dengan Firebase Database
+                userMap["fullname"] = fullname_setprofile_edittext.text.toString().toLowerCase()
+                userMap["username"] = username_setprofile_edittext.text.toString().toLowerCase()
+                userMap["bio"]      = bio_setprofile_edittext.text.toString().toLowerCase()
+                userMap["image"]    = myUrl
+
+                ref.child(firebaseUser.uid).updateChildren(userMap)
+
+                Toast.makeText(this,"Info Profile has been update", Toast.LENGTH_LONG).show()
+
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+                progressDialog.dismiss()
+
                 val fileRef = storageProfilePictureRef!!.child(firebaseUser!!.uid + "jpg")
 
                 var uploadTask: StorageTask<*>
@@ -225,6 +257,48 @@ class SettingActivity : AppCompatActivity() {
                 })
             }
 
+        }
+    }
+
+
+    private fun finalDataUpload() {
+        inFullname = fullname_setprofile_edittext.text.toString()
+        inUsername = username_setprofile_edittext.text.toString()
+        inBiodata = bio_setprofile_edittext.text.toString()
+
+        if(inFullname != fbFullname || inUsername != fbUsername || inBiodata != fbBiodata){
+            val usersRef = FirebaseDatabase.getInstance().reference.child("Users")
+            val fileRef = storageProfilePictureRef!!.child(firebaseUser.uid + "jpg")
+            val uploadTask: StorageTask<*>
+            val userMap = HashMap<String, Any>()
+            uploadTask = fileRef.putFile(imageUri!!)
+            uploadTask.continueWithTask(Continuation <UploadTask.TaskSnapshot, Task<Uri>>{ task ->
+                if (!task.isSuccessful){
+                    task.exception.let {
+                        throw it!!
+                    }
+                }
+                return@Continuation fileRef.downloadUrl
+            }).addOnCompleteListener ( OnCompleteListener<Uri> { task ->
+                if (task.isSuccessful) {
+                    val downloadUrl = task.result
+                    myUrl = downloadUrl.toString()
+                    myUrl = fbImage
+                    userMap["image"] = myUrl
+                    userMap["fullname"] = inFullname
+                    userMap["username"] = inUsername
+                    userMap["bio"]      = inBiodata
+                    usersRef.child(firebaseUser.uid).updateChildren(userMap)
+                    Toast.makeText(this,"Info Profile has been update", Toast.LENGTH_LONG).show()
+                    val intent = Intent(this@SettingActivity, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+            })
+        }else if(inImage == null){
+            Toast.makeText(this, "Anda belum merubah apapun", Toast.LENGTH_SHORT).show()
+        }else{
+            Toast.makeText(this, "Anda belum merubah apapun", Toast.LENGTH_SHORT).show()
         }
     }
 }

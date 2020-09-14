@@ -57,7 +57,7 @@ class RegisterActivity : AppCompatActivity() {
                     mAuth.signOut()
                     Toast.makeText(
                         this,
-                        "Email/Password salah",
+                        "Account sudah dibuat",
                         Toast.LENGTH_SHORT
                     ).show()
 
@@ -82,8 +82,7 @@ class RegisterActivity : AppCompatActivity() {
         userMap["email"] = email
         userMap["bio"] = "Hey Iam student at IDN Boarding School"
         //create default image profile
-        userMap["image"] =
-            "https://firebasestorage.googleapis.com/v0/b/instagram-app-256b6.appspot.com/o/Default%20Images%2Fprofile.png?alt=media&token=ecebab92-ce4f-463c-a16a-a81fc34b0772"
+        userMap["image"] = "https://firebasestorage.googleapis.com/v0/b/instagram-app-256b6.appspot.com/o/Default%20Images%2Fprofile.png?alt=media&token=ecebab92-ce4f-463c-a16a-a81fc34b0772"
 
         usersRef.child(currentUserID).setValue(userMap)
             .addOnCompleteListener { task ->
