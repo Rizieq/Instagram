@@ -32,104 +32,101 @@ class ProfileFragment: Fragment() {
 
     var postListGrid: MutableList<Post>? = null
     var myImagesAdapter: MyImagesAdapter? = null
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val viewProfile = inflater.inflate(R.layout.fragment_profile, container, false)
-
+        val view = inflater.inflate(R.layout.fragment_profile, container, false)
         firebaseUser = FirebaseAuth.getInstance().currentUser!!
 
         val pref = context?.getSharedPreferences("PREFS", Context.MODE_PRIVATE)
-        if (pref != null)
-        {
-            this.profileId = pref.getString("profileId","none")!!
+        if (pref != null) {
+            this.profileId = pref?.getString("profileId", "none")!!
         }
+
+        val prefEdit = context?.getSharedPreferences("PREFS", Context.MODE_PRIVATE)?.edit()
+        prefEdit?.putString("profileId", firebaseUser.uid)
+        prefEdit?.apply()
 
         if (profileId == firebaseUser.uid) {
-
             view?.btn_edit_account?.text = "Edit Profile"
-
-        } else if (profileId != firebaseUser.uid){
-
-            checkFollowAndFollowingStatus()
+        } else if (profileId != firebaseUser.uid) {
+            checkFollowerOrFollowingStatus()
         }
 
-        var recyclerViewUploadImages: RecyclerView? = null
-        recyclerViewUploadImages = viewProfile.findViewById(R.id.recyclerview_upload_picimage)
+        val recyclerViewUploadImages: RecyclerView?
+        recyclerViewUploadImages = view.findViewById(R.id.recyclerview_upload_picimage)
         recyclerViewUploadImages?.setHasFixedSize(true)
-        val linearLayoutManager = GridLayoutManager(context,3)
+        val linearLayoutManager = GridLayoutManager(context, 3)
         recyclerViewUploadImages?.layoutManager = linearLayoutManager
 
         postListGrid = ArrayList()
         myImagesAdapter = context?.let { MyImagesAdapter(it, postListGrid as ArrayList<Post>) }
         recyclerViewUploadImages?.adapter = myImagesAdapter
 
+        getFollowers()
+        getFollowings()
+        userInfo()
+        myPost()
 
-        //merubah Account Settings and Profile Page Follow and Following Button
-        //sesuai kondisi
-        viewProfile.btn_edit_account.setOnClickListener {
+        view.btn_edit_account.setOnClickListener {
             val getButtonText = view?.btn_edit_account?.text.toString()
-
-            //when kondisi
-            when{
-                //jika button text = Edit profile maka intent ke Setting Account activity
-                getButtonText == "Edit Profile" -> startActivity(Intent(context,SettingActivity::class.java))
+            when {
+                getButtonText == "Edit Profile" -> startActivity(
+                    Intent(
+                        context,
+                        SettingActivity::class.java
+                    )
+                )
 
                 getButtonText == "Follow" -> {
                     firebaseUser.uid.let { it1 ->
                         FirebaseDatabase.getInstance().reference
-                            .child("Follow").child(it1.toString())
+                            .child("Follow").child(it1)
                             .child("Following").child(profileId).setValue(true)
                     }
 
                     firebaseUser?.uid.let { it1 ->
                         FirebaseDatabase.getInstance().reference
                             .child("Follow").child(profileId)
-                            .child("Followers").child(it1.toString()).setValue(true)
+                            .child("Followers").child(it1).setValue(true)
                     }
                 }
 
                 getButtonText == "Following" -> {
                     firebaseUser?.uid.let { it1 ->
                         FirebaseDatabase.getInstance().reference
-                            .child("Follow").child(it1.toString())
+                            .child("Follow").child(it1)
                             .child("Following").child(profileId).removeValue()
                     }
 
                     firebaseUser?.uid.let { it1 ->
                         FirebaseDatabase.getInstance().reference
                             .child("Follow").child(profileId)
-                            .child("Followers").child(it1.toString()).removeValue()
+                            .child("Followers").child(it1).removeValue()
                     }
                 }
             }
 
         }
 
-        getFollowers()
-        getFollowings()
-        userInfo()
-        myPost()
-
-        return viewProfile
+        return view
     }
 
-
-    private fun checkFollowAndFollowingStatus(){
-        val followingRef = firebaseUser?.uid.let { it1 ->
+    private fun checkFollowerOrFollowingStatus() {
+        val followingRef = firebaseUser.uid.let { it1 ->
             FirebaseDatabase.getInstance().reference
-                .child("Follow").child(it1.toString())
+                .child("Follow").child(it1)
                 .child("Following")
         }
 
-        if (followingRef != null)
-        {
+        if (followingRef != null) {
             followingRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(p0: DataSnapshot) {
 
-                    if (p0.child(profileId).exists())
-                    {
+                    if (p0.child(profileId).exists()) {
                         view?.btn_edit_account?.text = "Following"
                     } else {
                         view?.btn_edit_account?.text = "Follow"
@@ -143,65 +140,54 @@ class ProfileFragment: Fragment() {
         }
     }
 
-
-    private fun getFollowers()
-    {
+    private fun getFollowers() {
         val followersRef = FirebaseDatabase.getInstance().reference
             .child("Follow").child(profileId)
             .child("Followers")
 
-        followersRef.addValueEventListener(object : ValueEventListener{
-            override fun onDataChange(p0: DataSnapshot)
-            {
-                if (p0.exists()){
+        followersRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(p0: DataSnapshot) {
+                if (p0.exists()) {
                     view?.txt_totalFollowers?.text = p0.childrenCount.toString()
                 }
             }
+
             override fun onCancelled(p0: DatabaseError) {
 
             }
         })
     }
 
-    private fun getFollowings()
-    {
+    private fun getFollowings() {
         val followersRef = FirebaseDatabase.getInstance().reference
-            //sesuai yang berada di firebase
             .child("Follow").child(profileId)
             .child("Following")
 
-        followersRef.addValueEventListener(object : ValueEventListener{
+        followersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
 
-                if (p0.exists()){
+                if (p0.exists()) {
                     view?.txt_totalFollowing?.text = p0.childrenCount.toString()
                 }
             }
+
             override fun onCancelled(p0: DatabaseError) {
 
             }
         })
     }
 
-    private fun myPost(){
-
+    private fun myPost() {
         val postRef = FirebaseDatabase.getInstance().reference.child("Posts")
-        postRef.addValueEventListener(object :ValueEventListener{
-
+        postRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
-
-                if (p0.exists()){
-
+                if (p0.exists()) {
                     (postListGrid as ArrayList<Post>).clear()
-
-                    for (snapshot in p0.children){
+                    for (snapshot in p0.children) {
                         val post = snapshot.getValue(Post::class.java)
-                        if (post?.getPublisher().equals(profileId))
-                        {
+                        if (post?.getPublisher().equals(profileId)) {
                             (postListGrid as ArrayList<Post>).add(post!!)
                         }
-
-//                        postListGrid?.reverse()
                         Collections.reverse(postListGrid)
                         myImagesAdapter!!.notifyDataSetChanged()
                     }
@@ -214,16 +200,15 @@ class ProfileFragment: Fragment() {
         })
     }
 
-    private fun userInfo(){
+    private fun userInfo() {
         val usersRef = FirebaseDatabase.getInstance().getReference()
             .child("Users").child(profileId)
 
-        usersRef.addValueEventListener(object : ValueEventListener{
+        usersRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(p0: DataSnapshot) {
 
-                if (p0.exists()){
+                if (p0.exists()) {
                     val user = p0.getValue<User>(User::class.java)
-
                     Picasso.get().load(user?.getImage()).placeholder(R.drawable.profile)
                         .into(view?.profile_image_gbr_frag)
                     view?.profile_fragment_username?.text = user?.getUsername()
@@ -231,34 +216,10 @@ class ProfileFragment: Fragment() {
                     view?.txt_bio_profile?.text = user?.getBio()
                 }
             }
+
             override fun onCancelled(p0: DatabaseError) {
 
             }
         })
     }
-
-    override fun onStop() {
-        super.onStop()
-        val pref = context?.getSharedPreferences("PREFS", Context.MODE_PRIVATE)?.edit()
-        pref?.putString("profileId", firebaseUser.uid)
-        pref?.apply()
-
-    }
-
-    override fun onPause() {
-        super.onPause()
-        val pref = context?.getSharedPreferences("PREFS",Context.MODE_PRIVATE)?.edit()
-        pref?.putString("profileId", firebaseUser.uid)
-        pref?.apply()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        val pref = context?.getSharedPreferences("PREFS",Context.MODE_PRIVATE)?.edit()
-        pref?.putString("profileId", firebaseUser.uid)
-        pref?.apply()
-    }
-
-
-
 }

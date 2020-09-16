@@ -3,7 +3,7 @@ package cookode.instagram_clone.model
 class Post {
 
     private var postid     : String = ""
-    private var postimage  : String = ""
+    private var postimage  : String? = null
     private var publisher  : String = ""
     private var description: String = ""
 
@@ -19,7 +19,7 @@ class Post {
         return postid
     }
 
-    fun getPostimage(): String{
+    fun getPostimage(): String? {
         return postimage
     }
 

@@ -40,7 +40,7 @@ class UserAdapter(private var mContext: Context, private val mUser: List<User>,
         val user = mUser[position]
         holder.userNametxtView.text = user.getUsername()
         holder.fullNametxtView.text = user.getFullname()
-        Picasso.get().load(user.getImage()).placeholder(R.drawable.profile).into(holder.userProfileImage)
+        Picasso.get().load(user.getImage()).error(R.drawable.close).placeholder(R.drawable.profile).into(holder.userProfileImage)
         
 
 

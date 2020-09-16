@@ -28,12 +28,7 @@ import cookode.instagram_clone.model.User
 import kotlinx.android.synthetic.main.activity_setting_account.*
 
 class SettingActivity : AppCompatActivity() {
-
-    private val firebaseAuth = FirebaseAuth.getInstance()
-    private val firebaseDb = FirebaseFirestore.getInstance()
-    private val firebaseStorage = FirebaseStorage.getInstance().reference
     private lateinit var firebaseUser: FirebaseUser
-    private var cekInfoProfile = ""
     private var myUrl = ""
     private var imageUri : Uri? = null
     private var storageProfilePictureRef: StorageReference? = null
@@ -44,7 +39,6 @@ class SettingActivity : AppCompatActivity() {
     private var fbBiodata: String = ""
     private var fbFullname: String = ""
 
-    private var inImage: String = ""
     private var inUsername: String = ""
     private var inBiodata: String = ""
     private var inFullname: String = ""
@@ -56,217 +50,74 @@ class SettingActivity : AppCompatActivity() {
         firebaseUser = FirebaseAuth.getInstance().currentUser!!
         storageProfilePictureRef = FirebaseStorage.getInstance().reference.child("Profile Picture")
 
-        logout_btn_setprofile.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-            finish()
-        }
 
-        change_setimage_text.setOnClickListener {
-            cekInfoProfile = "clicked"
-
-            CropImage.activity()
-                .setAspectRatio(1,1)
-                .start(this)
-        }
 
         save_info_profile_btn.setOnClickListener {
-            if (cekInfoProfile == "clicked"){
-                //create method untuk upload image profile
-                uploadImageAndUpdateInfo()
-            } else {
-                updateUserInfoOnly()
-            }
-
-
+            finalDataUpload()
         }
 
-        delete_account_btn_setprofile.setOnClickListener {
-            onDelete()
+        setprofile_image_view.setOnClickListener{
+            ambilFoto()
         }
 
 
+        logout_btn_setprofile.setOnClickListener {
+            logout()
+        }
         userInfo()
-    }
-
-    private fun onDelete() {
-        firebaseDb.collection("Users").document(firebaseUser.uid).delete()
-        firebaseStorage.child("image").child(firebaseUser.uid).delete()
-        firebaseAuth.currentUser?.delete()
-            ?.addOnCompleteListener {
-                startActivity(Intent(this,LoginActivity::class.java))
-                finish()
-            }
-            ?.addOnFailureListener {
-                Toast.makeText(this,"Update Failed",Toast.LENGTH_SHORT).show()
-            }
 
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK
             && data!= null){
             val result = CropImage.getActivityResult(data)
             imageUri = result.uri
             setprofile_image_view.setImageURI(imageUri)
-        } else {
-
         }
-    }
-
-    private fun updateUserInfoOnly() {
-        //after create user map
-        when {
-            TextUtils.isEmpty(fullname_setprofile_edittext.text.toString()) -> {
-                Toast.makeText(this,"Please dont be empty..", Toast.LENGTH_LONG).show()
-            }
-            username_setprofile_edittext.text.toString() == "" -> {
-                Toast.makeText(this,"Please dont be empty..", Toast.LENGTH_LONG).show()
-            }
-            bio_setprofile_edittext.text.toString() == "" -> {
-                Toast.makeText(this,"Please dont be empty..", Toast.LENGTH_LONG).show()
-            }
-            else -> {
-                val usersRef = FirebaseDatabase.getInstance().reference
-                    .child("Users")
-
-                val userMap = HashMap<String, Any>()
-                userMap["fullname"] = fullname_setprofile_edittext.text.toString().toLowerCase()
-                userMap["username"] = username_setprofile_edittext.text.toString().toLowerCase()
-                userMap["bio"]      = bio_setprofile_edittext.text.toString().toLowerCase()
-
-                usersRef.child(firebaseUser.uid).updateChildren(userMap)
-
-                Toast.makeText(this,"Info Profile has been update", Toast.LENGTH_LONG).show()
-
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-
-            }
-        }
-
     }
 
     private fun userInfo(){
-        val usersRef = FirebaseDatabase.getInstance().getReference()
-            .child("Users").child(firebaseUser.uid)
-
-        usersRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(p0: DataSnapshot) {
-
-                if (p0.exists()){
-                    val user = p0.getValue<User>(User::class.java)
-
-                    Picasso.get().load(user!!.getImage()).placeholder(R.drawable.profile)
-                        .into(setprofile_image_view)
-                    username_setprofile_edittext.setText(user.getUsername())
-                    fullname_setprofile_edittext.setText(user.getFullname())
-                    bio_setprofile_edittext.setText(user.getBio())
+        usersRef.reference.child("Users").child(firebaseUser.uid).
+            addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(p0: DataSnapshot) {
+                    if (p0.exists()){
+                        val user = p0.getValue<User>(User::class.java)
+                        fbImage = user!!.getImage()!!
+                        fbUsername = user.getUsername()
+                        fbFullname = user.getFullname()
+                        fbBiodata = user.getBio()
+                        Picasso.get().load(fbImage).placeholder(R.drawable.profile).into(setprofile_image_view)
+                        username_setprofile_edittext.setText(fbUsername).toString()
+                        fullname_setprofile_edittext.setText(fbFullname).toString()
+                        bio_setprofile_edittext.setText(fbBiodata).toString()
+                    }
                 }
-            }
 
-            override fun onCancelled(p0: DatabaseError) {
+                override fun onCancelled(p0: DatabaseError) {
 
-            }
-        })
+                }
+            })
     }
 
-    private fun uploadImageAndUpdateInfo() {
-
-        when{
-            imageUri == null -> Toast.makeText(this,"Please select image", Toast.LENGTH_LONG).show()
-            TextUtils.isEmpty(fullname_setprofile_edittext.text.toString()) -> {
-                Toast.makeText(this,"Please dont be empty..", Toast.LENGTH_LONG).show()
-            }
-            username_setprofile_edittext.text.toString() == "" -> {
-                Toast.makeText(this,"Please dont be empty..", Toast.LENGTH_LONG).show()
-            }
-            bio_setprofile_edittext.text.toString() == "" -> {
-                Toast.makeText(this,"Please dont be empty..", Toast.LENGTH_LONG).show()
-            }
-            else -> {
-                val progressDialog = ProgressDialog(this)
-                progressDialog.setTitle("ACCOUNT SETTING")
-                progressDialog.setMessage("Please wait.., we are updating profile..")
-                progressDialog.show()
-
-
-
-                val ref = FirebaseDatabase.getInstance().reference.child("Users")
-
-                val userMap = HashMap<String, Any>()
-                //sesuai dengan Firebase Database
-                userMap["fullname"] = fullname_setprofile_edittext.text.toString().toLowerCase()
-                userMap["username"] = username_setprofile_edittext.text.toString().toLowerCase()
-                userMap["bio"]      = bio_setprofile_edittext.text.toString().toLowerCase()
-                userMap["image"]    = myUrl
-
-                ref.child(firebaseUser.uid).updateChildren(userMap)
-
-                Toast.makeText(this,"Info Profile has been update", Toast.LENGTH_LONG).show()
-
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-                progressDialog.dismiss()
-
-                val fileRef = storageProfilePictureRef!!.child(firebaseUser!!.uid + "jpg")
-
-                var uploadTask: StorageTask<*>
-                uploadTask = fileRef.putFile(imageUri!!)
-                uploadTask.continueWithTask(Continuation <UploadTask.TaskSnapshot, Task<Uri>>{ task ->
-                    if (!task.isSuccessful){
-
-                        task.exception.let {
-                            throw it!!
-                            progressDialog.dismiss()
-                        }
-                    }
-                    return@Continuation fileRef.downloadUrl
-                }).addOnCompleteListener ( OnCompleteListener<Uri> { task ->
-                    if (task.isSuccessful){
-                        val downloadUrl = task.result
-                        myUrl = downloadUrl.toString()
-
-                        val ref = FirebaseDatabase.getInstance().reference.child("Users")
-
-                        val userMap = HashMap<String, Any>()
-                        //sesuai dengan Firebase Database
-                        userMap["fullname"] = fullname_setprofile_edittext.text.toString().toLowerCase()
-                        userMap["username"] = username_setprofile_edittext.text.toString().toLowerCase()
-                        userMap["bio"]      = bio_setprofile_edittext.text.toString().toLowerCase()
-                        userMap["image"]    = myUrl
-
-                        ref.child(firebaseUser.uid).updateChildren(userMap)
-
-                        Toast.makeText(this,"Info Profile has been update", Toast.LENGTH_LONG).show()
-
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                        progressDialog.dismiss()
-                    } else {
-                        progressDialog.dismiss()
-                    }
-                })
-            }
-
-        }
+    private fun ambilFoto(){
+        CropImage.activity()
+            .setAspectRatio(1,1)
+            .start(this@SettingActivity)
     }
-
 
     private fun finalDataUpload() {
+        val progressDialog = ProgressDialog(this)
+        progressDialog.setTitle("ACCOUNT SETTING")
+        progressDialog.setMessage("Please wait.., we are updating profile..")
+        progressDialog.show()
+
         inFullname = fullname_setprofile_edittext.text.toString()
         inUsername = username_setprofile_edittext.text.toString()
         inBiodata = bio_setprofile_edittext.text.toString()
 
-        if(inFullname != fbFullname || inUsername != fbUsername || inBiodata != fbBiodata){
+        if(imageUri != null && inFullname != fbFullname || inUsername != fbUsername || inBiodata != fbBiodata){
             val usersRef = FirebaseDatabase.getInstance().reference.child("Users")
             val fileRef = storageProfilePictureRef!!.child(firebaseUser.uid + "jpg")
             val uploadTask: StorageTask<*>
@@ -281,9 +132,9 @@ class SettingActivity : AppCompatActivity() {
                 return@Continuation fileRef.downloadUrl
             }).addOnCompleteListener ( OnCompleteListener<Uri> { task ->
                 if (task.isSuccessful) {
+                    progressDialog.dismiss()
                     val downloadUrl = task.result
                     myUrl = downloadUrl.toString()
-                    myUrl = fbImage
                     userMap["image"] = myUrl
                     userMap["fullname"] = inFullname
                     userMap["username"] = inUsername
@@ -293,12 +144,23 @@ class SettingActivity : AppCompatActivity() {
                     val intent = Intent(this@SettingActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()
+                }else{
+                    progressDialog.dismiss()
                 }
             })
-        }else if(inImage == null){
-            Toast.makeText(this, "Anda belum merubah apapun", Toast.LENGTH_SHORT).show()
-        }else{
-            Toast.makeText(this, "Anda belum merubah apapun", Toast.LENGTH_SHORT).show()
+        }else if(imageUri == null){
+            Toast.makeText(this, "Foto harus diubah", Toast.LENGTH_SHORT).show()
+            progressDialog.dismiss()
         }
     }
+
+
+    private fun logout(){
+        FirebaseAuth.getInstance().signOut()
+        startActivity(Intent(this,LoginActivity::class.java).addFlags(
+            Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+        ))
+    }
+
+
 }
