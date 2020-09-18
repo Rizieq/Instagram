@@ -21,88 +21,72 @@ import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.android.synthetic.main.activity_add_post.*
 import kotlinx.android.synthetic.main.activity_setting_account.*
 
-class AddPostActivity: AppCompatActivity() {
-    private lateinit var firebaseUser: FirebaseUser
+class AddPostActivity : AppCompatActivity() {
+
     private var myUrl = ""
-    private var imageUri : Uri? = null
+    private var imageUri: Uri? = null
     private var storageProfilePictureRef: StorageReference? = null
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_post)
 
-        storageProfilePictureRef = FirebaseStorage.getInstance().reference.child("Profile Picture")
-        save_new_post_btn.setOnClickListener { uploadContent()  } //create method upload Image
+        storageProfilePictureRef = FirebaseStorage.getInstance().reference.child("Post Picture")
 
+        save_new_post_btn.setOnClickListener {
+            uploadContent()
+        }
         CropImage.activity()
-            .setAspectRatio(2,1) //Ukurun post
+            .setAspectRatio(1,1)
             .start(this@AddPostActivity)
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK
-            && data!= null){
+            && data != null
+        ) {
             val result = CropImage.getActivityResult(data)
             imageUri = result.uri
-            setprofile_image_view.setImageURI(imageUri)
+            image_post.setImageURI(imageUri)
         }
     }
 
-
-
-    private fun uploadContent(){
-        when(imageUri){
-            null -> Toast.makeText(this,"Gambar ga boleh kosong",Toast.LENGTH_SHORT).show()
+    private fun uploadContent() {
+        when (imageUri) {
+            null -> Toast.makeText(this, "Gambar tidak boleh kosong", Toast.LENGTH_LONG)
             else -> {
-
-
-                val fileRef = storageProfilePictureRef!!.child(System.currentTimeMillis().toString() + ".jpg")
-
-                var uploadTask: StorageTask<*>
-                uploadTask = fileRef.putFile(imageUri!!)
-
-                uploadTask.continueWithTask(Continuation <UploadTask.TaskSnapshot, Task<Uri>>{ task ->
-                    if (!task.isSuccessful){
-
+                val fileRef =
+                    storageProfilePictureRef?.child(System.currentTimeMillis().toString() + ".jpg")
+                val uploadTask: StorageTask<*>
+                val ref = FirebaseDatabase.getInstance().reference.child("Posts")
+                var postId = ref.push().key
+                uploadTask = fileRef!!.putFile(imageUri!!)
+                uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+                    if (!task.isSuccessful) {
                         task.exception.let {
                             throw it!!
-
                         }
                     }
                     return@Continuation fileRef.downloadUrl
-                }).addOnCompleteListener ( OnCompleteListener<Uri> { task ->
+                }).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val downloadUrl = task.result
                         myUrl = downloadUrl.toString()
-
-                        val ref = FirebaseDatabase.getInstance().reference.child("Posts")
-                        val postId = ref.push().key
-
                         val postMap = HashMap<String, Any>()
-                        //sesuai dengan Firebase Database
-                        postMap["postid"] = postId!!
-                        postMap["description"] = deskripsi_post.text.toString().toLowerCase()
-                        postMap["publisher"] = FirebaseAuth.getInstance().currentUser!!.uid
-                        postMap["postimage"] = myUrl
-
-                        ref.child(postId).updateChildren(postMap)
-
-                        Toast.makeText(this, "Post Success..", Toast.LENGTH_LONG).show()
-
+                        postMap ["postId"] = postId!!
+                        postMap ["description"] = deskripsi_post.text.toString()
+                        postMap ["publisher"] = FirebaseAuth.getInstance().currentUser!!.uid
+                        postMap ["postimage"] = myUrl
+                        ref.child(postId).setValue(postMap)
+                        Toast.makeText(this,"Content uploaded", Toast.LENGTH_LONG).show()
                         val intent = Intent(this@AddPostActivity, MainActivity::class.java)
                         startActivity(intent)
-                        finish()
-
                     } else {
-                        Toast.makeText(this, "Post Failled..", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this,"Content failed to upload", Toast.LENGTH_LONG).show()
                     }
-                })
+                }
             }
         }
     }
-
-
-
 }
