@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.activity_setting_account.*
 class SettingActivity : AppCompatActivity() {
     private lateinit var firebaseUser: FirebaseUser
     private var myUrl = ""
-    private var imageUri : Uri? = null
+    private var imageUri: Uri? = null
     private var storageProfilePictureRef: StorageReference? = null
 
     private var usersRef = FirebaseDatabase.getInstance()
@@ -56,7 +56,7 @@ class SettingActivity : AppCompatActivity() {
             finalDataUpload()
         }
 
-        setprofile_image_view.setOnClickListener{
+        setprofile_image_view.setOnClickListener {
             ambilFoto()
         }
 
@@ -71,24 +71,26 @@ class SettingActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK
-            && data!= null){
+            && data != null
+        ) {
             val result = CropImage.getActivityResult(data)
             imageUri = result.uri
             setprofile_image_view.setImageURI(imageUri)
         }
     }
 
-    private fun userInfo(){
-        usersRef.reference.child("Users").child(firebaseUser.uid).
-            addValueEventListener(object : ValueEventListener {
+    private fun userInfo() {
+        usersRef.reference.child("Users").child(firebaseUser.uid)
+            .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(p0: DataSnapshot) {
-                    if (p0.exists()){
+                    if (p0.exists()) {
                         val user = p0.getValue<User>(User::class.java)
                         fbImage = user!!.getImage()!!
                         fbUsername = user.getUsername()
                         fbFullname = user.getFullname()
                         fbBiodata = user.getBio()
-                        Picasso.get().load(fbImage).placeholder(R.drawable.profile).into(setprofile_image_view)
+                        Picasso.get().load(fbImage).placeholder(R.drawable.profile)
+                            .into(setprofile_image_view)
                         username_setprofile_edittext.setText(fbUsername).toString()
                         fullname_setprofile_edittext.setText(fbFullname).toString()
                         bio_setprofile_edittext.setText(fbBiodata).toString()
@@ -101,9 +103,9 @@ class SettingActivity : AppCompatActivity() {
             })
     }
 
-    private fun ambilFoto(){
+    private fun ambilFoto() {
         CropImage.activity()
-            .setAspectRatio(1,1)
+            .setAspectRatio(1, 1)
             .start(this@SettingActivity)
     }
 
@@ -116,21 +118,23 @@ class SettingActivity : AppCompatActivity() {
         inFullname = fullname_setprofile_edittext.text.toString()
         inUsername = username_setprofile_edittext.text.toString()
         inBiodata = bio_setprofile_edittext.text.toString()
-
-        if(imageUri != null && inFullname != fbFullname || inUsername != fbUsername || inBiodata != fbBiodata){
+        if (imageUri == null) {
+            Toast.makeText(this, "Foto harus diubah", Toast.LENGTH_SHORT).show()
+            progressDialog.dismiss()
+        } else if (inFullname != fbFullname || inUsername != fbUsername || inBiodata != fbBiodata) {
             val usersRef = FirebaseDatabase.getInstance().reference.child("Users")
             val fileRef = storageProfilePictureRef!!.child(firebaseUser.uid + "jpg")
             val uploadTask: StorageTask<*>
             val userMap = HashMap<String, Any>()
             uploadTask = fileRef.putFile(imageUri!!)
-            uploadTask.continueWithTask(Continuation <UploadTask.TaskSnapshot, Task<Uri>>{ task ->
-                if (!task.isSuccessful){
+            uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+                if (!task.isSuccessful) {
                     task.exception.let {
                         throw it!!
                     }
                 }
                 return@Continuation fileRef.downloadUrl
-            }).addOnCompleteListener ( OnCompleteListener<Uri> { task ->
+            }).addOnCompleteListener(OnCompleteListener<Uri> { task ->
                 if (task.isSuccessful) {
                     progressDialog.dismiss()
                     val downloadUrl = task.result
@@ -138,28 +142,30 @@ class SettingActivity : AppCompatActivity() {
                     userMap["image"] = myUrl
                     userMap["fullname"] = inFullname
                     userMap["username"] = inUsername
-                    userMap["bio"]      = inBiodata
+                    userMap["bio"] = inBiodata
                     usersRef.child(firebaseUser.uid).updateChildren(userMap)
-                    Toast.makeText(this,"Info Profile has been update", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Info Profile has been update", Toast.LENGTH_LONG).show()
                     val intent = Intent(this@SettingActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()
-                }else{
+                } else {
                     progressDialog.dismiss()
                 }
             })
-        }else if(imageUri == null){
+        } else if (imageUri == null) {
             Toast.makeText(this, "Foto harus diubah", Toast.LENGTH_SHORT).show()
             progressDialog.dismiss()
         }
     }
 
 
-    private fun logout(){
+    private fun logout() {
         FirebaseAuth.getInstance().signOut()
-        startActivity(Intent(this,LoginActivity::class.java).addFlags(
-            Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-        ))
+        startActivity(
+            Intent(this, LoginActivity::class.java).addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            )
+        )
     }
 
 
