@@ -44,6 +44,7 @@ class UserAdapter(private var mContext: Context, private val mUser: List<User>,
         
 
 
+
         //method untuk mengetahui status user
         cekFollowingStatus(user.getUID(),holder.followButton)
 
